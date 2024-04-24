@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Ukrainians.Domain.Core.Models;
 using Ukrainians.Infrastrusture.Data.Entities;
 using Ukrainians.Infrastrusture.Data.Stores;
@@ -6,6 +7,7 @@ using Ukrainians.UtilityServices.Services.ChatMessage;
 using Ukrainians.UtilityServices.Services.ChatRoom;
 using Ukrainians.UtilityServices.Services.Encryption;
 using Ukrainians.UtilityServices.Settings;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Ukrainians.Domain.Core.Services.ChatMessageD
 {
@@ -27,12 +29,11 @@ namespace Ukrainians.Domain.Core.Services.ChatMessageD
             _mapper = mapper;
             _chatRoomDomainService = chatRoomDomainService;
         }
-
+         
         public async Task<IEnumerable<ChatMessageDomain>> GetAllChatMessages()
         {
             var messages = (await _chatMessageRepository.GetAll()).ToList();
             messages.ForEach(s => s.Content = EncryptionService.Decrypt(s.Content, _settings.Key));
-
             return _mapper.Map<IEnumerable<ChatMessageDomain>>(messages);
         }
 
@@ -41,7 +42,9 @@ namespace Ukrainians.Domain.Core.Services.ChatMessageD
             var messages = (await _chatMessageRepository.GetAllByRoomId(roomId)).ToList();
             messages.ForEach(s => s.Content = EncryptionService.Decrypt(s.Content, _settings.Key));
 
-            return _mapper.Map<IEnumerable<ChatMessageDomain>>(messages);
+            var result = _mapper.Map<IEnumerable<ChatMessageDomain>>(messages);
+
+            return result;
         }
 
         public async Task<ChatMessageDomain?> GetLastMessageByChatRoomId(Guid chatRoomId)
@@ -104,6 +107,7 @@ namespace Ukrainians.Domain.Core.Services.ChatMessageD
                 Id = m.Id,
                 IsDeleted = m.IsDeleted,
                 Unread = m.Unread,
+                Picture = m.Picture,
             });
 
             var messages = _mapper.Map<IEnumerable<ChatMessage>>(messagesToUpdate);

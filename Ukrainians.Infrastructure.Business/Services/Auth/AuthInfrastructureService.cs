@@ -43,26 +43,26 @@ namespace Ukrainians.Infrastructure.Business.Services.Auth
 
         public async Task<AuthResultModel> Login(AuthModel authModel)
         {
-            var user = await _userRepository.FindByUsername(authModel.Name);
+            var user = await _userRepository.FindByUsername(authModel.UserName);
 
             if (user == null)
             {
-                user = await _userRepository.FindByEmail(authModel.Name);
+                user = await _userRepository.FindByEmail(authModel.UserName);
             }
 
             if (user == null || !CheckPassword(user, authModel.Password))
             {
-                _logger.LogInformation($"Unsuccessful login attempt with email {authModel.Name}");
+                _logger.LogInformation($"Unsuccessful login attempt with email {authModel.UserName}");
                 return UnsuccessfulLogin(ErrorCode.InvalidLogin);
             }
 
             if (!await _userManager.IsEmailConfirmedAsync(user))
             {
-                _logger.LogInformation($"Unsuccessful login attempt with email {authModel.Name}");
+                _logger.LogInformation($"Unsuccessful login attempt with email {authModel.UserName}");
                 return UnsuccessfulLogin(ErrorCode.InvalidEmail);
             }
 
-            _logger.LogInformation($"User {authModel.Name} successfully logged in");
+            _logger.LogInformation($"User {authModel.UserName} successfully logged in");
             return new AuthResultModel
             {
                 IsSuccess = true,
@@ -72,7 +72,7 @@ namespace Ukrainians.Infrastructure.Business.Services.Auth
 
         public async Task<AuthResultModel> Signup(AuthModel authModel)
         {
-            var username = authModel.Name;
+            var username = authModel.UserName;
             var email = authModel.Email;
             var isUser = await _userManager.FindByEmailAsync(email);
 
@@ -100,7 +100,7 @@ namespace Ukrainians.Infrastructure.Business.Services.Auth
                     username = $"user-{random.Next(0, 1000000):D6}";
                 }
 
-                var user = new User(username, email, userRole!);
+                var user = new User(username, username, email, userRole!, false);
 
                 await _userManager.CreateAsync(user);
 

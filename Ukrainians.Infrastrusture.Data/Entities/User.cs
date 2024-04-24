@@ -9,12 +9,16 @@ namespace Ukrainians.Infrastrusture.Data.Entities
         {
         }
 
-        public User(string userName, string email, Role role)
+        public User(string userName, string nameToDisplay, string email, Role role, bool isEmailConfirmed)
         {
             UserName = userName;
+            NameToDisplay = nameToDisplay;
             Role = role;
             Email = email;
+            EmailConfirmed = isEmailConfirmed;
         }
+
+        public string NameToDisplay { get; set; }
 
         public byte[]? ProfilePicture { get; set; }
 
@@ -23,5 +27,6 @@ namespace Ukrainians.Infrastrusture.Data.Entities
 
         public Guid? RoleId { get; set; }
         public Role Role { get; set; }
+        public ICollection<ChatRoom> ChatRooms { get; set; }
     }
 }

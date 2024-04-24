@@ -56,6 +56,26 @@ namespace NomadChat.WebAPI.Controllers
         }
 
         [Authorize]
+        [HttpPost("update-username")]
+        public async Task<IActionResult> UpdateUsername([FromForm] string oldUsername, [FromForm] string newUsername)
+        {
+
+            if (string.IsNullOrEmpty(oldUsername) || string.IsNullOrEmpty(newUsername))
+            {
+                return BadRequest("Invalid username");
+            }
+
+            var user = await _userManager.FindByNameAsync(oldUsername);
+            if (user == null)
+                return BadRequest("Invalid user");
+
+            user.NameToDisplay = newUsername;
+            await _userManager.UpdateAsync(user);
+
+            return Ok(newUsername);
+        }
+
+        [Authorize]
         [HttpPost("delete-profile-picture")]
         public async Task<IActionResult> DeleteProfilePicture([FromForm] string username)
         {

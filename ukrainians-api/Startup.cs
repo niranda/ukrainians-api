@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using NomadChat.WebAPI.Configs;
 using NomadChat.WebAPI.Helpers.IoC;
@@ -8,6 +9,7 @@ using NomadChat.WebAPI.Settings;
 using System.Reflection;
 using Ukrainians.Infrastrusture.Data.Context;
 using Ukrainians.UtilityServices.Models.Common;
+using Ukrainians.UtilityServices.Settings;
 using WebPush;
 
 namespace NomadChat.WebAPI
@@ -40,7 +42,10 @@ namespace NomadChat.WebAPI
 
             services.AddSingleton(emailConfig);
 
-            services.AddSignalR();
+            services.AddSignalR(options =>
+            {
+                options.MaximumReceiveMessageSize = 52428800;
+            });
 
             services.AddCors();
 
@@ -53,7 +58,12 @@ namespace NomadChat.WebAPI
 
             services.RegisterJwt(Configuration);
 
-            services.AddAutoMapper(typeof(MapperProfile).GetTypeInfo().Assembly);
+            //services.AddAutoMapper(typeof(MapperProfile).GetTypeInfo().Assembly);
+
+            services.AddSingleton(provider => new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new MapperProfile(provider.GetService<EncryptionSettings>()));
+            }).CreateMapper());
 
             services.AddControllersWithViews().AddNewtonsoftJson(opt =>
                 opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);

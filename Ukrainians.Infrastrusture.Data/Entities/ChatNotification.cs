@@ -13,6 +13,7 @@ namespace Ukrainians.Infrastrusture.Data.Entities
         [Required]
         [StringLength(50)]
         public string Username { get; set; }
+        [Required]
         public int UnreadMessages { get; set; }
 
         public Guid? ChatRoomId { get; set; }

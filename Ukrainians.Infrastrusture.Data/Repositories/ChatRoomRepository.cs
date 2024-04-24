@@ -78,10 +78,34 @@ namespace Ukrainians.Infrastrusture.Data.Repositories
 
         public async Task<bool> Delete(ChatRoom room)
         {
-            room.IsDeleted = true;
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    // Удаление уведомлений, связанных с комнатой
+                    var notifications = _context.ChatNotifications.Where(n => n.ChatRoomId == room.Id);
+                    _context.ChatNotifications.RemoveRange(notifications);
 
-            await _context.SaveChangesAsync();
-            return true;
+                    // Удаление сообщений из чата
+                    _context.ChatMessages.RemoveRange(room.ChatMessages);
+
+                    // Удаление комнаты
+                    _context.ChatRooms.Remove(room);
+
+                    await _context.SaveChangesAsync();
+
+                    transaction.Commit();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    // Здесь можно добавить логирование ошибки
+                    Console.WriteLine($"Ошибка при удалении комнаты: {ex.Message}");
+
+                    transaction.Rollback();
+                    return false;
+                }
+            }
         }
     }
 }

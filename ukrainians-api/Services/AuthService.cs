@@ -27,7 +27,7 @@ namespace NomadChat.WebAPI.Services
                 throw new ArgumentNullException(nameof(authModel));
             }
 
-            _logger.LogInformation($"Request to log in a user with email {authModel.Name}");
+            _logger.LogInformation($"Request to log in a user with email {authModel.UserName}");
             return _authService.Login(authModel);
         }
 

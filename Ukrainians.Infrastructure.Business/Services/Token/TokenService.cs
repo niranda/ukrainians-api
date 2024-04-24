@@ -45,6 +45,7 @@ namespace Ukrainians.Infrastructure.Business.Services.Token
             var claims = new List<Claim>
             {
                 new Claim("name", user.UserName),
+                new Claim("nameToDisplay", user.NameToDisplay),
                 new Claim("role", user.Role.Name),
                 new Claim("email", user.Email),
                 new Claim("id", user.Id.ToString())

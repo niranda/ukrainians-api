@@ -21,15 +21,15 @@ namespace NomadChat.WebAPI.Services
             {
                 foreach (var user in Users)
                 {
-                    if (user.Key.ToLower() == userToAdd.Name.ToLower() || user.Key.ToLower() == userToAdd.Email?.ToLower()) 
+                    if (user.Key.ToLower() == userToAdd.UserName.ToLower() || user.Key.ToLower() == userToAdd.Email?.ToLower()) 
                     {
                         RemoveUserFromList(user.Key);
                         RemoveUserNotificationId(user.Key);
                     };
                 }
 
-                Users.Add(userToAdd.Name, string.Empty);
-                UsersNotifications.Add(userToAdd.Name, string.Empty);
+                Users.Add(userToAdd.UserName, string.Empty);
+                UsersNotifications.Add(userToAdd.UserName, string.Empty);
 
                 _logger.LogInformation($"User {userToAdd} is online");
                 return true;

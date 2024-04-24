@@ -48,7 +48,7 @@ namespace NomadChat.WebAPI.Helpers.Database
             var testUsername = "n3onick";
             var testRole = "User";
             var testEmail = "test123@gmail.com";
-            var testPassword = EncryptionService.Encrypt("123456", _settings.Key);
+            var testPassword = EncryptionService.Encrypt("a123456", _settings.Key);
 
             var isUserRole = await _roleManager.FindByNameAsync(testRole);
             if (isUserRole == null)
@@ -61,7 +61,7 @@ namespace NomadChat.WebAPI.Helpers.Database
             {
                 var userRole = await _context.Roles.FirstOrDefaultAsync(role => role.Name == testRole);
 
-                var user = new User(testUsername, testEmail, userRole!);
+                var user = new User(testUsername, testUsername, testEmail, userRole!, true);
 
                 await _userManager.CreateAsync(user);
 

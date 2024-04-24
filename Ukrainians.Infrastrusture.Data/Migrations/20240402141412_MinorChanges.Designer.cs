@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Ukrainians.Infrastrusture.Data.Context;
 
@@ -11,9 +12,11 @@ using Ukrainians.Infrastrusture.Data.Context;
 namespace NomadChat.Infrastrusture.Data.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240402141412_MinorChanges")]
+    partial class MinorChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace NomadChat.Infrastrusture.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("ChatRoomUser", b =>
-                {
-                    b.Property<Guid>("ChatRoomsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UsersId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ChatRoomsId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("ChatRoomUser");
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
@@ -165,9 +153,6 @@ namespace NomadChat.Infrastrusture.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<byte[]>("Picture")
-                        .HasColumnType("varbinary(max)");
-
                     b.Property<string>("To")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -294,6 +279,9 @@ namespace NomadChat.Infrastrusture.Data.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<Guid?>("ChatRoomId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -310,10 +298,6 @@ namespace NomadChat.Infrastrusture.Data.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NameToDisplay")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -354,6 +338,8 @@ namespace NomadChat.Infrastrusture.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ChatRoomId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -365,21 +351,6 @@ namespace NomadChat.Infrastrusture.Data.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("ChatRoomUser", b =>
-                {
-                    b.HasOne("Ukrainians.Infrastrusture.Data.Entities.ChatRoom", null)
-                        .WithMany()
-                        .HasForeignKey("ChatRoomsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Ukrainians.Infrastrusture.Data.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -453,6 +424,10 @@ namespace NomadChat.Infrastrusture.Data.Migrations
 
             modelBuilder.Entity("Ukrainians.Infrastrusture.Data.Entities.User", b =>
                 {
+                    b.HasOne("Ukrainians.Infrastrusture.Data.Entities.ChatRoom", null)
+                        .WithMany("Users")
+                        .HasForeignKey("ChatRoomId");
+
                     b.HasOne("Ukrainians.Infrastrusture.Data.Entities.Role", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId");
@@ -465,6 +440,8 @@ namespace NomadChat.Infrastrusture.Data.Migrations
                     b.Navigation("ChatMessages");
 
                     b.Navigation("Notifications");
+
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }
